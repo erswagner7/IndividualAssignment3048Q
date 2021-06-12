@@ -44,6 +44,8 @@ class CountryUnitTest {
         //create and add countries to our collection
         var france = Country("FR", "France")
         allCountries.add(france)
+        var belize = Country("BZ", "Belize")
+        allCountries.add(belize)
         allCountryLiveData.postValue(allCountries)
         every {countryService.fetchCountries()} returns allCountryLiveData
         mvm.countryService = countryService

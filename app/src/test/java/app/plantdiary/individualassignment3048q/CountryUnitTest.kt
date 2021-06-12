@@ -1,8 +1,12 @@
 package app.plantdiary.individualassignment3048q
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import app.plantdiary.individualassignment3048q.ui.main.MainViewModel
 import app.plantdiary.individualassignment3048q.dto.Country
+import app.plantdiary.individualassignment3048q.service.CountryService
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -26,23 +30,36 @@ class CountryUnitTest {
     var rule: TestRule = InstantTaskExecutorRule()
     lateinit var mvm: MainViewModel
 
+    var countryService = mockk<CountryService>()
+
     @Before
     fun populateCountries() {
         mvm = MainViewModel()
+        createMockData()
+    }
 
+    private fun createMockData() {
+        var allCountryLiveData = MutableLiveData<ArrayList<Country>>()
+        var allCountries = ArrayList<Country>()
+        //create and add countries to our collection
+        var france = Country("FR", "France")
+        allCountries.add(france)
+        allCountryLiveData.postValue(allCountries)
+        every {countryService.fetchCountries()} returns allCountryLiveData
+        mvm.countryService = countryService
     }
 
     @Test
     fun countryDTO_maintainsState() {
         var country = Country("NZ", "New Zealand")
-        assertTrue(country.code.equals("NZ") )
-        assertTrue(country.name.equals("New Zealand"))
+        assertTrue(country.code == "NZ")
+        assertTrue(country.name == "New Zealand")
     }
 
     @Test
     fun countryDTO_toStringFormat() {
         var country = Country("NZ", "New Zealand")
-        assertTrue(country.toString().equals("New Zealand NZ"))
+        assertTrue(country.toString() == "New Zealand NZ")
     }
 
     @Test
@@ -82,7 +99,7 @@ class CountryUnitTest {
         var containsBelize:Boolean = false
         mvm.countries.observeForever {
             it.forEach {
-                if (it.name.equals("Belize")) {
+                if (it.name == "Belize") {
                     containsBelize = true
                 }
             }
